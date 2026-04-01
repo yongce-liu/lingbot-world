@@ -1,14 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "lingbot-world"
 version = "1.0.0"
 description = "LingBot-World: Advancing Open-source World Models"
-authors = [
-    { name = "Robbyant Team" }
-]
+authors = [{ name = "Robbyant Team" }]
 license = { file = "LICENSE.txt" }
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
@@ -27,18 +25,11 @@ dependencies = [
     "imageio-ffmpeg",
     "flash_attn",
     "numpy>=1.23.5,<2",
-    "scipy"
+    "scipy",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "black",
-    "flake8",
-    "isort",
-    "mypy",
-    "huggingface-hub[cli]"
-]
+dev = ["pytest", "black", "flake8", "isort", "mypy", "huggingface-hub[cli]"]
 
 [project.urls]
 homepage = "https://technology.robbyant.com/lingbot-world"
@@ -46,11 +37,11 @@ documentation = "https://github.com/robbyant/lingbot-world"
 repository = "https://github.com/robbyant/lingbot-world"
 huggingface = "https://huggingface.co/robbyant/lingbot-world-base-cam"
 
-[tool.setuptools]
+[tool.hatch.build.targets.wheel]
 packages = ["wan"]
 
-[tool.setuptools.package-data]
-"wan" = ["**/*.py"]
+[tool.hatch.build.targets.sdist]
+include = ["/wan"]
 
 [tool.black]
 line-length = 88
@@ -61,4 +52,6 @@ profile = "black"
 [tool.mypy]
 strict = true
 
-
+[tool.uv.extra-build-dependencies]
+lingbot-world = ["hatchling"]
+flash-attn = ["torch"]
