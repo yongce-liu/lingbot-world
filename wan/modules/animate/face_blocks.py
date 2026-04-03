@@ -1,4 +1,3 @@
-
 from torch import nn
 import torch
 from typing import Tuple, Optional
@@ -110,7 +109,6 @@ def attention(
 
 
 class CausalConv1d(nn.Module):
-
     def __init__(self, chan_in, chan_out, kernel_size=3, stride=1, dilation=1, pad_mode="replicate", **kwargs):
         super().__init__()
 
@@ -123,7 +121,6 @@ class CausalConv1d(nn.Module):
     def forward(self, x):
         x = F.pad(x, self.time_causal_padding, mode=self.pad_mode)
         return self.conv(x)
-
 
 
 class FaceEncoder(nn.Module):
@@ -148,13 +145,12 @@ class FaceEncoder(nn.Module):
         self.padding_tokens = nn.Parameter(torch.zeros(1, 1, 1, hidden_dim))
 
     def forward(self, x):
-        
         x = rearrange(x, "b t c -> b c t")
         b, c, t = x.shape
 
         x = self.conv1_local(x)
         x = rearrange(x, "b (n c) t -> (b n) t c", n=self.num_heads)
-        
+
         x = self.norm1(x)
         x = self.act(x)
         x = rearrange(x, "b t c -> b c t")
@@ -174,7 +170,6 @@ class FaceEncoder(nn.Module):
         x_local = x.clone()
 
         return x_local
-
 
 
 class RMSNorm(nn.Module):
@@ -263,7 +258,6 @@ class FaceAdapter(nn.Module):
         dtype=None,
         device=None,
     ):
-
         factory_kwargs = {"dtype": dtype, "device": device}
         super().__init__()
         self.hidden_size = hidden_dim
@@ -289,9 +283,7 @@ class FaceAdapter(nn.Module):
         freqs_cis_q: Tuple[torch.Tensor, torch.Tensor] = None,
         freqs_cis_k: Tuple[torch.Tensor, torch.Tensor] = None,
     ) -> torch.Tensor:
-
         return self.fuser_blocks[idx](x, motion_embed, freqs_cis_q, freqs_cis_k)
-
 
 
 class FaceBlock(nn.Module):
@@ -313,7 +305,7 @@ class FaceBlock(nn.Module):
         self.heads_num = heads_num
         head_dim = hidden_size // heads_num
         self.scale = qk_scale or head_dim**-0.5
-       
+
         self.linear1_kv = nn.Linear(hidden_size, hidden_size * 2, **factory_kwargs)
         self.linear1_q = nn.Linear(hidden_size, hidden_size, **factory_kwargs)
 
@@ -338,7 +330,6 @@ class FaceBlock(nn.Module):
         motion_mask: Optional[torch.Tensor] = None,
         use_context_parallel=False,
     ) -> torch.Tensor:
-        
         B, T, N, C = motion_vec.shape
         T_comp = T
 
@@ -355,13 +346,13 @@ class FaceBlock(nn.Module):
         q = self.q_norm(q).to(v)
         k = self.k_norm(k).to(v)
 
-        k = rearrange(k, "B L N H D -> (B L) N H D")  
-        v = rearrange(v, "B L N H D -> (B L) N H D") 
+        k = rearrange(k, "B L N H D -> (B L) N H D")
+        v = rearrange(v, "B L N H D -> (B L) N H D")
 
         if use_context_parallel:
             q = gather_forward(q, dim=1)
 
-        q = rearrange(q, "B (L S) H D -> (B L) S H D", L=T_comp)  
+        q = rearrange(q, "B (L S) H D -> (B L) S H D", L=T_comp)
         # Compute attention.
         attn = attention(
             q,

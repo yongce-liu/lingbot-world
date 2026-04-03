@@ -13,9 +13,8 @@ from sam_utils import load_video_frames_v2, load_video_frames
 
 class SAM2VideoPredictor(_SAM2VideoPredictor):
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
-        
+
     @torch.inference_mode()
     def init_state(
         self,
@@ -23,7 +22,7 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
         offload_video_to_cpu=False,
         offload_state_to_cpu=False,
         async_loading_frames=False,
-        frame_names=None
+        frame_names=None,
     ):
         """Initialize a inference state."""
         images, video_height, video_width = load_video_frames(
@@ -31,7 +30,7 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
             image_size=self.image_size,
             offload_video_to_cpu=offload_video_to_cpu,
             async_loading_frames=async_loading_frames,
-            frame_names=frame_names
+            frame_names=frame_names,
         )
         inference_state = {}
         inference_state["images"] = images
@@ -88,12 +87,12 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
 
     @torch.inference_mode()
     def init_state_v2(
-            self,
-            frames,
-            offload_video_to_cpu=False,
-            offload_state_to_cpu=False,
-            async_loading_frames=False,
-            frame_names=None
+        self,
+        frames,
+        offload_video_to_cpu=False,
+        offload_state_to_cpu=False,
+        async_loading_frames=False,
+        frame_names=None,
     ):
         """Initialize a inference state."""
         images, video_height, video_width = load_video_frames_v2(
@@ -101,7 +100,7 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
             image_size=self.image_size,
             offload_video_to_cpu=offload_video_to_cpu,
             async_loading_frames=async_loading_frames,
-            frame_names=frame_names
+            frame_names=frame_names,
         )
         inference_state = {}
         inference_state["images"] = images

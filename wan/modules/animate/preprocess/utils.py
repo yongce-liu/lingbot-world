@@ -1,9 +1,9 @@
-
 import os
 import cv2
 import math
 import random
 import numpy as np
+
 
 def get_mask_boxes(mask):
     """
@@ -40,7 +40,8 @@ def get_aug_mask(body_mask, w_len=10, h_len=20):
                 body_mask[h_start:h_end, w_start:w_end] = 1
 
     return body_mask
-    
+
+
 def get_mask_body_img(img_copy, hand_mask, k=7, iterations=1):
     kernel = np.ones((k, k), np.uint8)
     dilation = cv2.dilate(hand_mask, kernel, iterations=iterations)
@@ -55,7 +56,6 @@ def get_face_bboxes(kp2ds, scale, image_shape, ratio_aug):
 
     min_x, min_y = np.min(kp2ds_face, axis=0)
     max_x, max_y = np.max(kp2ds_face, axis=0)
-
 
     initial_width = max_x - min_x
     initial_height = max_y - min_y
@@ -85,23 +85,17 @@ def get_face_bboxes(kp2ds, scale, image_shape, ratio_aug):
 
 
 def calculate_new_size(orig_w, orig_h, target_area, divisor=64):
-
     target_ratio = orig_w / orig_h
 
     def check_valid(w, h):
-
         if w <= 0 or h <= 0:
             return False
-        return (w * h <= target_area and  
-                w % divisor == 0 and  
-                h % divisor == 0)  
+        return w * h <= target_area and w % divisor == 0 and h % divisor == 0
 
     def get_ratio_diff(w, h):
-
         return abs(w / h - target_ratio)
 
     def round_to_64(value, round_up=False, divisor=64):
-
         if round_up:
             return divisor * ((value + (divisor - 1)) // divisor)
         return divisor * (value // divisor)
@@ -150,8 +144,9 @@ def resize_by_area(image, target_area, keep_aspect_ratio=True, divisor=64, paddi
 
     interpolation = cv2.INTER_AREA if (new_w * new_h < w * h) else cv2.INTER_LINEAR
 
-    resized_image = padding_resize(image, height=new_h, width=new_w, padding_color=padding_color,
-                                    interpolation=interpolation)
+    resized_image = padding_resize(
+        image, height=new_h, width=new_w, padding_color=padding_color, interpolation=interpolation
+    )
     return resized_image
 
 
@@ -173,15 +168,15 @@ def padding_resize(img_ori, height=512, width=512, padding_color=(0, 0, 0), inte
         img = cv2.resize(img_ori, (new_width, height), interpolation=interpolation)
         padding = int((width - new_width) / 2)
         if len(img.shape) == 2:
-            img = img[:, :, np.newaxis]  
-        img_pad[:, padding: padding + new_width, :] = img
+            img = img[:, :, np.newaxis]
+        img_pad[:, padding : padding + new_width, :] = img
     else:
         new_height = int(width / ori_width * ori_height)
         img = cv2.resize(img_ori, (width, new_height), interpolation=interpolation)
         padding = int((height - new_height) / 2)
         if len(img.shape) == 2:
-            img = img[:, :, np.newaxis]  
-        img_pad[padding: padding + new_height, :, :] = img
+            img = img[:, :, np.newaxis]
+        img_pad[padding : padding + new_height, :, :] = img
 
     img_pad = np.uint8(img_pad)
 
@@ -189,7 +184,6 @@ def padding_resize(img_ori, height=512, width=512, padding_color=(0, 0, 0), inte
 
 
 def get_frame_indices(frame_num, video_fps, clip_length, train_fps):
-
     start_frame = 0
     times = np.arange(0, clip_length) / train_fps
     frame_indices = start_frame + np.round(times * video_fps).astype(int)

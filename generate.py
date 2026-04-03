@@ -5,7 +5,7 @@ import sys
 import warnings
 from datetime import datetime
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 import random
 
@@ -21,10 +21,8 @@ from wan.utils.utils import merge_video_audio, save_video, str2bool
 
 EXAMPLE_PROMPT = {
     "i2v-A14B": {
-        "prompt":
-            "The video presents a cinematic, first-person wandering experience through a hyper-realistic urban environment rendered in a video game engine. It begins with a static, sun-drenched alley framed by graffiti-laden industrial walls and overhead power lines, immediately establishing a gritty, lived-in atmosphere. As the camera pans right and tilts upward, it reveals a sprawling cityscape dominated by towering skyscrapers and industrial infrastructure, all bathed in warm, late-afternoon light that casts long shadows and produces dramatic lens flares. The perspective then transitions into a smooth forward tracking shot along a cracked sidewalk, passing weathered fences, palm trees, and distant pedestrians, creating a sense of immersion and exploration. Midway, the camera briefly follows a walking figure before refocusing on the broader streetscape, culminating in a stabilized view of a small blue van parked at an intersection surrounded by urban elements like parking garages and traffic lights. The entire sequence is characterized by its photorealistic detail, dynamic lighting, and deliberate pacing, evoking the feel of a quiet, sunlit afternoon in a futuristic metropolis.",
-        "image":
-            "examples/02/image.jpg",
+        "prompt": "The video presents a cinematic, first-person wandering experience through a hyper-realistic urban environment rendered in a video game engine. It begins with a static, sun-drenched alley framed by graffiti-laden industrial walls and overhead power lines, immediately establishing a gritty, lived-in atmosphere. As the camera pans right and tilts upward, it reveals a sprawling cityscape dominated by towering skyscrapers and industrial infrastructure, all bathed in warm, late-afternoon light that casts long shadows and produces dramatic lens flares. The perspective then transitions into a smooth forward tracking shot along a cracked sidewalk, passing weathered fences, palm trees, and distant pedestrians, creating a sense of immersion and exploration. Midway, the camera briefly follows a walking figure before refocusing on the broader streetscape, culminating in a stabilized view of a small blue van parked at an intersection surrounded by urban elements like parking garages and traffic lights. The entire sequence is characterized by its photorealistic detail, dynamic lighting, and deliberate pacing, evoking the feel of a quiet, sunlit afternoon in a futuristic metropolis.",
+        "image": "examples/02/image.jpg",
     },
 }
 
@@ -57,140 +55,73 @@ def _validate_args(args):
     if args.frame_num is None:
         args.frame_num = cfg.frame_num
 
-    args.base_seed = args.base_seed if args.base_seed >= 0 else random.randint(
-        0, sys.maxsize)
+    args.base_seed = args.base_seed if args.base_seed >= 0 else random.randint(0, sys.maxsize)
     # Size check
-    if not 's2v' in args.task:
-        assert args.size in SUPPORTED_SIZES[
-            args.
-            task], f"Unsupport size {args.size} for task {args.task}, supported sizes are: {', '.join(SUPPORTED_SIZES[args.task])}"
+    if not "s2v" in args.task:
+        assert args.size in SUPPORTED_SIZES[args.task], (
+            f"Unsupport size {args.size} for task {args.task}, supported sizes are: {', '.join(SUPPORTED_SIZES[args.task])}"
+        )
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(
-        description="Generate a image or video from a text prompt or image using Wan"
-    )
+    parser = argparse.ArgumentParser(description="Generate a image or video from a text prompt or image using Wan")
     parser.add_argument(
-        "--task",
-        type=str,
-        default="i2v-A14B",
-        choices=list(WAN_CONFIGS.keys()),
-        help="The task to run.")
+        "--task", type=str, default="i2v-A14B", choices=list(WAN_CONFIGS.keys()), help="The task to run."
+    )
     parser.add_argument(
         "--size",
         type=str,
         default="1280*720",
         choices=list(SIZE_CONFIGS.keys()),
-        help="The area (width*height) of the generated video. For the I2V task, the aspect ratio of the output video will follow that of the input image."
+        help="The area (width*height) of the generated video. For the I2V task, the aspect ratio of the output video will follow that of the input image.",
     )
     parser.add_argument(
-        "--frame_num",
-        type=int,
-        default=None,
-        help="How many frames of video are generated. The number should be 4n+1"
+        "--frame_num", type=int, default=None, help="How many frames of video are generated. The number should be 4n+1"
     )
-    parser.add_argument(
-        "--ckpt_dir",
-        type=str,
-        default=None,
-        help="The path to the checkpoint directory.")
+    parser.add_argument("--ckpt_dir", type=str, default=None, help="The path to the checkpoint directory.")
     parser.add_argument(
         "--offload_model",
         type=str2bool,
         default=None,
-        help="Whether to offload the model to CPU after each model forward, reducing GPU memory usage."
+        help="Whether to offload the model to CPU after each model forward, reducing GPU memory usage.",
     )
-    parser.add_argument(
-        "--ulysses_size",
-        type=int,
-        default=1,
-        help="The size of the ulysses parallelism in DiT.")
-    parser.add_argument(
-        "--t5_fsdp",
-        action="store_true",
-        default=False,
-        help="Whether to use FSDP for T5.")
-    parser.add_argument(
-        "--t5_cpu",
-        action="store_true",
-        default=False,
-        help="Whether to place T5 model on CPU.")
-    parser.add_argument(
-        "--dit_fsdp",
-        action="store_true",
-        default=False,
-        help="Whether to use FSDP for DiT.")
-    parser.add_argument(
-        "--save_file",
-        type=str,
-        default=None,
-        help="The file to save the generated video to.")
-    parser.add_argument(
-        "--prompt",
-        type=str,
-        default=None,
-        help="The prompt to generate the video from.")
-    parser.add_argument(
-        "--use_prompt_extend",
-        action="store_true",
-        default=False,
-        help="Whether to use prompt extend.")
+    parser.add_argument("--ulysses_size", type=int, default=1, help="The size of the ulysses parallelism in DiT.")
+    parser.add_argument("--t5_fsdp", action="store_true", default=False, help="Whether to use FSDP for T5.")
+    parser.add_argument("--t5_cpu", action="store_true", default=False, help="Whether to place T5 model on CPU.")
+    parser.add_argument("--dit_fsdp", action="store_true", default=False, help="Whether to use FSDP for DiT.")
+    parser.add_argument("--save_file", type=str, default=None, help="The file to save the generated video to.")
+    parser.add_argument("--prompt", type=str, default=None, help="The prompt to generate the video from.")
+    parser.add_argument("--use_prompt_extend", action="store_true", default=False, help="Whether to use prompt extend.")
     parser.add_argument(
         "--prompt_extend_method",
         type=str,
         default="local_qwen",
         choices=["dashscope", "local_qwen"],
-        help="The prompt extend method to use.")
-    parser.add_argument(
-        "--prompt_extend_model",
-        type=str,
-        default=None,
-        help="The prompt extend model to use.")
+        help="The prompt extend method to use.",
+    )
+    parser.add_argument("--prompt_extend_model", type=str, default=None, help="The prompt extend model to use.")
     parser.add_argument(
         "--prompt_extend_target_lang",
         type=str,
         default="zh",
         choices=["zh", "en"],
-        help="The target language of prompt extend.")
+        help="The target language of prompt extend.",
+    )
+    parser.add_argument("--base_seed", type=int, default=42, help="The seed to use for generating the video.")
+    parser.add_argument("--image", type=str, default=None, help="The image to generate the video from.")
+    parser.add_argument("--action_path", type=str, default=None, help="The camera path to generate the video from.")
     parser.add_argument(
-        "--base_seed",
-        type=int,
-        default=42,
-        help="The seed to use for generating the video.")
+        "--sample_solver", type=str, default="unipc", choices=["unipc", "dpm++"], help="The solver used to sample."
+    )
+    parser.add_argument("--sample_steps", type=int, default=None, help="The sampling steps.")
     parser.add_argument(
-        "--image",
-        type=str,
-        default=None,
-        help="The image to generate the video from.")
+        "--sample_shift", type=float, default=None, help="Sampling shift factor for flow matching schedulers."
+    )
+    parser.add_argument("--sample_guide_scale", type=float, default=None, help="Classifier free guidance scale.")
     parser.add_argument(
-        "--action_path",
-        type=str,
-        default=None,
-        help="The camera path to generate the video from.")
-    parser.add_argument(
-        "--sample_solver",
-        type=str,
-        default='unipc',
-        choices=['unipc', 'dpm++'],
-        help="The solver used to sample.")
-    parser.add_argument(
-        "--sample_steps", type=int, default=None, help="The sampling steps.")
-    parser.add_argument(
-        "--sample_shift",
-        type=float,
-        default=None,
-        help="Sampling shift factor for flow matching schedulers.")
-    parser.add_argument(
-        "--sample_guide_scale",
-        type=float,
-        default=None,
-        help="Classifier free guidance scale.")
-    parser.add_argument(
-        "--convert_model_dtype",
-        action="store_true",
-        default=False,
-        help="Whether to convert model paramerters dtype.")
-    
+        "--convert_model_dtype", action="store_true", default=False, help="Whether to convert model paramerters dtype."
+    )
+
     args = parser.parse_args()
     _validate_args(args)
 
@@ -204,7 +135,8 @@ def _init_logging(rank):
         logging.basicConfig(
             level=logging.INFO,
             format="[%(asctime)s] %(levelname)s: %(message)s",
-            handlers=[logging.StreamHandler(stream=sys.stdout)])
+            handlers=[logging.StreamHandler(stream=sys.stdout)],
+        )
     else:
         logging.basicConfig(level=logging.ERROR)
 
@@ -218,22 +150,15 @@ def generate(args):
 
     if args.offload_model is None:
         args.offload_model = False if world_size > 1 else True
-        logging.info(
-            f"offload_model is not specified, set to {args.offload_model}.")
+        logging.info(f"offload_model is not specified, set to {args.offload_model}.")
     if world_size > 1:
         torch.cuda.set_device(local_rank)
-        dist.init_process_group(
-            backend="nccl",
-            init_method="env://",
-            rank=rank,
-            world_size=world_size)
+        dist.init_process_group(backend="nccl", init_method="env://", rank=rank, world_size=world_size)
     else:
-        assert not (
-            args.t5_fsdp or args.dit_fsdp
-        ), f"t5_fsdp and dit_fsdp are not supported in non-distributed environments."
-        assert not (
-            args.ulysses_size > 1
-        ), f"sequence parallel are not supported in non-distributed environments."
+        assert not (args.t5_fsdp or args.dit_fsdp), (
+            f"t5_fsdp and dit_fsdp are not supported in non-distributed environments."
+        )
+        assert not (args.ulysses_size > 1), f"sequence parallel are not supported in non-distributed environments."
 
     if args.ulysses_size > 1:
         assert args.ulysses_size == world_size, f"The number of ulysses_size should be equal to the world size."
@@ -241,7 +166,9 @@ def generate(args):
 
     cfg = WAN_CONFIGS[args.task]
     if args.ulysses_size > 1:
-        assert cfg.num_heads % args.ulysses_size == 0, f"`{cfg.num_heads=}` cannot be divided evenly by `{args.ulysses_size=}`."
+        assert cfg.num_heads % args.ulysses_size == 0, (
+            f"`{cfg.num_heads=}` cannot be divided evenly by `{args.ulysses_size=}`."
+        )
 
     logging.info(f"Generation job args: {args}")
     logging.info(f"Generation model config: {cfg}")
@@ -269,7 +196,7 @@ def generate(args):
             dist.broadcast_object_list(input_prompt, src=0)
         args.prompt = input_prompt[0]
         logging.info(f"Extended prompt: {args.prompt}")
-    
+
     logging.info("Creating WanI2V pipeline.")
     wan_i2v = wan.WanI2V(
         config=cfg,
@@ -294,15 +221,18 @@ def generate(args):
         sampling_steps=args.sample_steps,
         guide_scale=args.sample_guide_scale,
         seed=args.base_seed,
-        offload_model=args.offload_model)
+        offload_model=args.offload_model,
+    )
 
     if rank == 0:
         if args.save_file is None:
             formatted_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-            formatted_prompt = args.prompt.replace(" ", "_").replace("/",
-                                                                     "_")[:50]
-            suffix = '.mp4'
-            args.save_file = f"{args.task}_{args.size.replace('*','x') if sys.platform=='win32' else args.size}_{args.ulysses_size}_{formatted_prompt}_{formatted_time}" + suffix
+            formatted_prompt = args.prompt.replace(" ", "_").replace("/", "_")[:50]
+            suffix = ".mp4"
+            args.save_file = (
+                f"{args.task}_{args.size.replace('*', 'x') if sys.platform == 'win32' else args.size}_{args.ulysses_size}_{formatted_prompt}_{formatted_time}"
+                + suffix
+            )
 
         logging.info(f"Saving generated video to {args.save_file}")
         save_video(
@@ -311,7 +241,8 @@ def generate(args):
             fps=cfg.sample_fps,
             nrow=1,
             normalize=True,
-            value_range=(-1, 1))
+            value_range=(-1, 1),
+        )
         if "s2v" in args.task:
             if args.enable_tts is False:
                 merge_video_audio(video_path=args.save_file, audio_path=args.audio)

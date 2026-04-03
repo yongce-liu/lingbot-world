@@ -55,3 +55,26 @@ strict = true
 [tool.uv.extra-build-dependencies]
 lingbot-world = ["hatchling"]
 flash-attn = ["torch"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort
+    "TID252", # relative-imports
+    "T10",    # debugger
+]
+ignore = [
+    "E402", # module-import-not-at-top-of-file
+    "E501", # line-too-long
+    "E721", # type-comparison
+    "E741", # ambiguous-variable-name
+    "F541", # f-string-missing-placeholders
+    "F811", # redefined-while-unused
+    "F841", # unused-variable
+]
+fixable = ["ALL"]
