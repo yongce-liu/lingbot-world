@@ -11,11 +11,11 @@ license = { file = "LICENSE.txt" }
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
 dependencies = [
-    "torch>=2.4.0",
-    "torchvision>=0.19.0",
+    "torch==2.8.0",
+    "torchvision==0.23.0",
     "opencv-python>=4.9.0.80",
     "diffusers>=0.31.0",
-    "transformers>=4.49.0",
+    "transformers>=4.49.0,<=4.51.3",
     "tokenizers>=0.20.3",
     "accelerate>=1.1.1",
     "tqdm",
@@ -23,13 +23,13 @@ dependencies = [
     "easydict",
     "ftfy",
     "imageio-ffmpeg",
-    "flash_attn",
+    "flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.8cxx11abiTRUE-cp310-cp310-linux_x86_64.whl",
     "numpy>=1.23.5,<2",
     "scipy",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "black", "flake8", "isort", "mypy", "huggingface-hub[cli]"]
+dev = ["pytest", "black", "flake8", "isort", "mypy", "huggingface-hub"]
 
 [project.urls]
 homepage = "https://technology.robbyant.com/lingbot-world"
@@ -43,6 +43,9 @@ packages = ["wan"]
 [tool.hatch.build.targets.sdist]
 include = ["/wan"]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.black]
 line-length = 88
 
@@ -54,7 +57,6 @@ strict = true
 
 [tool.uv.extra-build-dependencies]
 lingbot-world = ["hatchling"]
-flash-attn = ["torch"]
 
 [tool.ruff]
 line-length = 120
